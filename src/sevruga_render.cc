@@ -19,6 +19,8 @@
 
 #ifdef _WIN32
 #include <cairo-win32.h>
+#include <mutex>
+static std::mutex m;
 #endif
 
 void checkProc(void *p, char *msg)
@@ -60,17 +62,22 @@ void renderExecute(napi_env env, void* data) {
   //cairo_surface_t *surface = cairo_win32_surface_create_with_dib(CAIRO_FORMAT_ARGB32, c->width, c->height);
   
   cairo_surface_t *surface = cairo_image_surface_create_for_data(c->renderBuffer, CAIRO_FORMAT_ARGB32, c->width, c->height, c->stride);
-
   cairo_t* cr = cairo_create(surface);
-  gboolean success = rsvg_handle_render_cairo(handle, cr);
-  if (FALSE == success) {
-    c->status = SEVRUGA_ASYNC_FAILURE;
-    char errorMsg[200];
-    sprintf(errorMsg, "In file %s line %d: %s.",
-      __FILE__, __LINE__ - 6, "failed to render SVG via cairo");
-    c->errorMsg = std::string(errorMsg);
-  }
+  {
+    #ifdef _WIN32
+    // cairo is not thread safe on windows
+    std::lock_guard<std::mutex> lk(m);
+    #endif
+    gboolean success = rsvg_handle_render_cairo(handle, cr);
 
+    if (FALSE == success) {
+      c->status = SEVRUGA_ASYNC_FAILURE;
+      char errorMsg[200];
+      sprintf(errorMsg, "In file %s line %d: %s.",
+        __FILE__, __LINE__ - 6, "failed to render SVG via cairo");
+      c->errorMsg = std::string(errorMsg);
+    }
+  }
   cairo_surface_flush(surface);
 
   // Win32 optimisation test
