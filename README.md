@@ -33,7 +33,8 @@ Install the librsvg library and header files. Usually you have to look for a dev
 
 - Windows:
 
-    Install [msys2](http://www.msys2.org/). Follow the instructions to ensure all packages are up-to-date. 
+    Install [msys2](http://www.msys2.org/). Follow the instructions to ensure all packages are up-to-date.
+    The installer defaults to install at C:\msys64. If you install to a different path you will need to update the GTK_Root variable in binding.gyp.
     
     Install build tools and librsvg via the pacman package manager:
 
@@ -66,9 +67,10 @@ sevruga exports the function renderSVG that returns a promise that will be resol
 
 ```Javascript
 const sevruga = require('sevruga');
+const fs = require('fs');
 
 async function svgTest() {
-  const svgStr = fs.readFileSync(`<filename>.svg`, { encoding: 'utf8' }); // returns a string
+  const svgStr = fs.readFileSync(`${__dirname}/svg/Test.svg`, { encoding: 'utf8' }); // returns a string
 
   const params = { width: 1920, height: 1080 };
   const renderBuf = Buffer.alloc(params.width * params.height * 4); // ARGB 8-bit per component  
@@ -78,6 +80,47 @@ async function svgTest() {
 }
 svgTest()
   .catch(err => console.log(`Sevruga render failed: ${err}`));
+```
+
+A Node.js transform stream implementation is also available. This allows a stream of SVG files to be processed, producing a stream of rendered buffers. This approach supports back-pressure so that there will be a limit on resources consumed.
+
+```Javascript
+const sevruga = require('../index.js');
+const fs = require('fs');
+
+function svgStreamTest() {
+  const svgStr = fs.readFileSync(`${__dirname}/svg/Test.svg`, { encoding: 'utf8' });
+  const params = { width: 1920, height: 1080 };
+  svgStream = sevruga.createRenderStream(params)
+  svgStream.on('data', buf => {
+    const t = buf.timings;
+    console.log(`Parse: ${t.parseTime}, Render: ${t.renderTime}, Total: ${t.totalTime}`);
+  });
+  svgStream.on('error', console.error);
+
+  let i = 10;
+  const write = str => {
+    var ok = true;
+    do {
+      i -= 1;
+      if (i === 0) {
+        // last time!
+        svgStream.end(str);
+      } else {
+        ok = svgStream.write(str, 'utf8');
+        // console.log('Write data', ok);
+      }
+    } while (i > 0 && ok);
+    if (i > 0) {
+      // had to stop early!
+      // write some more once it drains
+      // console.log("So draining.");
+      svgStream.once('drain', () => write(svgStr));
+    }
+  }
+  write(svgStr);
+}
+svgStreamTest();
 ```
 
 ## Status, support and further development

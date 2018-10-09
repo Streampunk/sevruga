@@ -16,16 +16,36 @@
 const sevruga = require('../index.js');
 const fs = require('fs');
 
-async function svgTest() {
+function svgStreamTest() {
   const svgStr = fs.readFileSync(`${__dirname}/svg/Test.svg`, { encoding: 'utf8' });
-
   const params = { width: 1920, height: 1080 };
-  const renderBuf = Buffer.alloc(params.width * params.height * 4); // ARGB 8-bit per component
-  
-  for (let x = 0; x < 10; x++) {
-    const t = await sevruga.renderSVG(svgStr, renderBuf, params);
+  svgStream = sevruga.createRenderStream(params)
+  svgStream.on('data', buf => {
+    const t = buf.timings;
     console.log(`Parse: ${t.parseTime}, Render: ${t.renderTime}, Total: ${t.totalTime}`);
+  });
+  svgStream.on('error', console.error);
+
+  let i = 10;
+  const write = str => {
+    var ok = true;
+    do {
+      i -= 1;
+      if (i === 0) {
+        // last time!
+        svgStream.end(str);
+      } else {
+        ok = svgStream.write(str, 'utf8');
+        // console.log('Write data', ok);
+      }
+    } while (i > 0 && ok);
+    if (i > 0) {
+      // had to stop early!
+      // write some more once it drains
+      // console.log("So draining.");
+      svgStream.once('drain', () => write(svgStr));
+    }
   }
+  write(svgStr);
 }
-svgTest()
-  .catch(err => console.log(`Sevruga render failed: ${err}`));
+svgStreamTest();
