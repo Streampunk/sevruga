@@ -23,13 +23,13 @@ Install the librsvg library and header files. Usually you have to look for a dev
     brew install librsvg
     ```
 
-    If, after installing LibRSVG through homebrew you are experiencing issues installing this module, try manually exporting the package config with this command:
+    If, after installing LibRSVG through homebrew you are experiencing not found issues when installing this module, try manually exporting the package config path for any not found package with a command like this:
 
     ```bash
-    export PKG_CONFIG_PATH=/opt/X11/lib/pkgconfig
+    export PKG_CONFIG_PATH=/usr/local/opt/zlib/lib/pkgconfig
     ```
 
-    Then try reinstalling this module. For further information, [see this thread](https://github.com/Homebrew/homebrew/issues/14123).
+    Then try reinstalling this module.
 
 - Windows:
 
