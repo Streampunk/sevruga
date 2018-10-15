@@ -5,7 +5,7 @@
 			[
 				"OS == 'mac'",
 				{
-					"pkg_env": "PKG_CONFIG_PATH=/opt/X11/lib/pkgconfig"
+					"pkg_env": "/usr/local/bin/pkg-config"
 				},
 				{
 					"pkg_env": ""
