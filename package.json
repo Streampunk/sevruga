@@ -1,6 +1,6 @@
 {
   "name": "sevruga",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Library to perform rendering from .svg files to Node.JS buffers.",
   "main": "index.js",
   "scripts": {
