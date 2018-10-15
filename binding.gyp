@@ -1,6 +1,6 @@
 {
 	"variables": {
-		"GTK_Root%": "c:\\msys64\\mingw64",
+		"GTK_Root%": "c:/msys64/mingw64",
 		"conditions": [
 			[
 				"OS == 'mac'",
@@ -59,18 +59,18 @@
         }],
         ["OS=='win'", {
           "include_dirs": [
-            "C:\msys64\mingw64\include\gdk-pixbuf-2.0",
-            "C:\msys64\mingw64\include\librsvg-2.0",
-            "C:\msys64\mingw64\include\cairo",
-            "C:\msys64\mingw64\include\glib-2.0",
-            "C:\msys64\mingw64\lib\glib-2.0\include"        
+            "<(GTK_Root)\include\gdk-pixbuf-2.0",
+            "<(GTK_Root)\include\librsvg-2.0",
+            "<(GTK_Root)\include\cairo",
+            "<(GTK_Root)\include\glib-2.0",
+            "<(GTK_Root)\lib\glib-2.0\include"        
           ],
           "link_settings": {
             "libraries": [ 
               "libcairo.dll.a"
             ],
             "library_dirs": [ 
-              "C:\msys64\mingw64\lib"
+              "<(GTK_Root)\lib"
             ]
           },
           "msvs_settings": {
@@ -79,7 +79,15 @@
 								"/EHsc"
 							]
 				  	}
-					}
+					},
+          "copies": [
+            {
+              "destination": "build/Release/",
+              "files": [
+                "<!@(ls -1 <(GTK_Root)/bin/*.dll)"
+              ]
+            }
+          ]
         }]
       ]
     }

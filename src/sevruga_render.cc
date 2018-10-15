@@ -250,6 +250,7 @@ napi_value renderSVG(napi_env env, napi_callback_info info) {
   }
 
   #ifdef _WIN32
+  SetDllDirectoryA(".\\build\\Release");
   c->hSVGDLL = LoadLibraryA("librsvg-2-2.dll");
   if (NULL == c->hSVGDLL)
   {
