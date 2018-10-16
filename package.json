@@ -1,6 +1,6 @@
 {
   "name": "sevruga",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Library to perform rendering from .svg files to Node.JS buffers.",
   "main": "index.js",
   "scripts": {
@@ -17,5 +17,9 @@
     "segfault-handler": "^1.0.1",
     "eslint": "^5.7.0",
     "tape": "^4.9.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Streampunk/sevruga.git"
+  },
 }
