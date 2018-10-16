@@ -68,6 +68,15 @@ int32_t rejectStatus(napi_env env, carrier* c, const char* file, int32_t line);
   return; \
 }
 
+#define ASYNC_CAIRO_ERROR if (status) { \
+  c->status = SEVRUGA_ASYNC_FAILURE; \
+  char errorMsg[200]; \
+  sprintf(errorMsg, "In file %s line %d: %s.", \
+    __FILE__, __LINE__ - 1, cairo_status_to_string(status)); \
+  c->errorMsg = std::string(errorMsg); \
+  return; \
+}
+
 #define REJECT_STATUS if (rejectStatus(env, c, __FILE__, __LINE__) != SEVRUGA_SUCCESS) return;
 #define FLOATING_STATUS if (status != napi_ok) { \
   printf("Unexpected N-API status not OK in file %s at line %d value %i.\n", \

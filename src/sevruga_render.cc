@@ -81,8 +81,10 @@ void renderExecute(napi_env env, void* data) {
   }
   cairo_surface_flush(surface);
 
-  if (!c->pngPath.empty())
+  if (!c->pngPath.empty()) {
     cairo_status_t status = cairo_surface_write_to_png (surface, c->pngPath.c_str());
+    ASYNC_CAIRO_ERROR;
+  }
 
   // Win32 optimisation test
   //unsigned char* renderData = cairo_image_surface_get_data(cairo_win32_surface_get_image(surface));
@@ -260,10 +262,16 @@ napi_value renderSVG(napi_env env, napi_callback_info info) {
     status = napi_get_named_property(env, params, "pngPath", &pngPathValue);
     CHECK_STATUS;
 
-    char pngPath[MAX_PATH];
-    status = napi_get_value_string_utf8(env, pngPathValue, pngPath, MAX_PATH, nullptr);
+    size_t pathLen = 0;
+    status = napi_get_value_string_utf8(env, pngPathValue, nullptr, 0, &pathLen);
+    CHECK_STATUS;
+    pathLen += 1; // null terminator
+    
+    char *pngPath = (char *)malloc(pathLen);
+    status = napi_get_value_string_utf8(env, pngPathValue, pngPath, pathLen, nullptr);
     CHECK_STATUS;
     c->pngPath = std::string(pngPath);
+    free(pngPath);
   }
 
   #ifdef _WIN32
