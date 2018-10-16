@@ -84,7 +84,7 @@
             {
               "destination": "build/Release/",
               "files": [
-                "<!@(ls -1 <(GTK_Root)/bin/*.dll)"
+                "<!@(node -p \"require('fs').readdirSync('<(GTK_Root)/bin').filter(f=>f.match(/.*\.dll/ig)).map(f=>'<(GTK_Root)/bin/'+f).join(' ')\")"
               ]
             }
           ]
