@@ -65,6 +65,11 @@ Note that the `--save` option is now the default.
 
 sevruga exports the function renderSVG that returns a promise that will be resolved when the supplied SVG data has been parsed and rendered to the supplied buffer according to the supplied width and height parameters. Timing parameters for the stages of render are available from the returned object as shown in the example below.
 
+renderSVG requires three parameters:
+1. A string containing the svg definition
+2. An allocated buffer of sufficient size for the render results.
+3. A params object which must include width and height members. An optional pngPath can be provided which if present will cause the output of a png version of the render result at the path provided.
+
 ```Javascript
 const sevruga = require('sevruga');
 const fs = require('fs');

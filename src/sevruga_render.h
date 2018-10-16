@@ -32,6 +32,7 @@ struct renderCarrier : carrier {
   uint32_t width;
   uint32_t height;
   uint32_t stride;
+  std::string pngPath;
   #ifdef _WIN32
   HINSTANCE hSVGDLL;
   #endif 
