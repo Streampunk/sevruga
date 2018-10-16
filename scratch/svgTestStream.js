@@ -19,7 +19,7 @@ const fs = require('fs');
 function svgStreamTest() {
   const svgStr = fs.readFileSync(`${__dirname}/svg/Test.svg`, { encoding: 'utf8' });
   const params = { width: 1920, height: 1080 };
-  svgStream = sevruga.createRenderStream(params)
+  const svgStream = sevruga.createRenderStream(params);
   svgStream.on('data', buf => {
     const t = buf.timings;
     console.log(`Parse: ${t.parseTime}, Render: ${t.renderTime}, Total: ${t.totalTime}`);
@@ -45,7 +45,7 @@ function svgStreamTest() {
       // console.log("So draining.");
       svgStream.once('drain', () => write(svgStr));
     }
-  }
+  };
   write(svgStr);
 }
 svgStreamTest();

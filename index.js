@@ -17,7 +17,7 @@ const addon = require('bindings')('sevruga');
 const { Transform } = require('stream');
 
 const SegfaultHandler = require('segfault-handler');
-SegfaultHandler.registerHandler("crash.log"); // With no argument, SegfaultHandler will generate a generic log file name
+SegfaultHandler.registerHandler('crash.log'); // With no argument, SegfaultHandler will generate a generic log file name
 
 function createRenderStream(params) {
   const svgRender = async (svgStr, buf, params) => await addon.renderSVG(svgStr, buf, params);
