@@ -275,7 +275,13 @@ napi_value renderSVG(napi_env env, napi_callback_info info) {
   }
 
   #ifdef _WIN32
-  SetDllDirectoryA(".\\build\\Release");
+  char dirBuf[MAX_PATH];
+  HMODULE hSevruga = GetModuleHandleA("sevruga.node");
+  GetModuleFileNameA(hSevruga, dirBuf, MAX_PATH);
+  std::string dirPath(dirBuf);
+  size_t lastSlash = dirPath.rfind('\\');
+  dirPath.erase(lastSlash);
+  SetDllDirectoryA(dirPath.c_str());
   c->hSVGDLL = LoadLibraryA("librsvg-2-2.dll");
   if (NULL == c->hSVGDLL)
   {
