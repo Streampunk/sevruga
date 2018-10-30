@@ -25,11 +25,10 @@ function checkResult(t, buf) {
 }
 
 tape('Test rendering from SVG file', t => {
-  const svgRender = async (svgStr, buf, params) => await sevruga.renderSVG(svgStr, buf, params);
   const svgStr = fs.readFileSync(`${__dirname}/svg/blocks.svg`, { encoding: 'utf8' });
   const params = { width: 200, height: 200 };
   const renderBuf = Buffer.alloc(params.width * params.height * 4); // ARGB 8-bit per component
-  svgRender(svgStr, renderBuf, params)
+  sevruga.renderSVG(svgStr, renderBuf, params)
     .then(()=> {
       checkResult(t, renderBuf);
       t.end();

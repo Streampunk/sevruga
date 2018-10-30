@@ -13,24 +13,20 @@
   limitations under the License.
 */
 
-const addon = require('../index.js');
+const sevruga = require('../index.js');
 const fs = require('fs');
 
-async function svgTest() {
+function svgTest() {
   const svgStr = fs.readFileSync(`${__dirname}/svg/Test.svg`, { encoding: 'utf8' });
-
   const params = { width: 1920, height: 1080 };
-  const renderBuf1 = Buffer.alloc(params.width * params.height * 4); // ARGB 8-bit per component
-  const renderBuf2 = Buffer.alloc(params.width * params.height * 4); // ARGB 8-bit per component
-  
   for (let x = 0; x < 10; x++) {
-    let [t1, t2] = await Promise.all([
-      addon.renderSVG(svgStr, renderBuf1, params),
-      addon.renderSVG(svgStr, renderBuf2, params)
-    ]);
-    console.log(`Parse: ${t1.parseTime}, Render: ${t1.renderTime}, Total: ${t1.totalTime}`);
-    console.log(`Parse: ${t2.parseTime}, Render: ${t2.renderTime}, Total: ${t2.totalTime}`);
+    const renderBuf = Buffer.alloc(params.width * params.height * 4); // ARGB 8-bit per component
+    sevruga.renderSVG(svgStr, renderBuf, params)
+      .then(t => 
+        console.log(`${x}: Parse: ${t.parseTime}, Render: ${t.renderTime}, Total: ${t.totalTime}`)
+      )
+      .catch(console.error);
   }
 }
-svgTest()
-  .catch(err => console.log(`Sevruga render failed: ${err}`));
+
+svgTest();

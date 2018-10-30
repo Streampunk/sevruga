@@ -55,20 +55,26 @@ void renderExecute(napi_env env, void* data) {
   ASYNC_SVG_ERROR;
 
   c->parseTime = microTime(parseStart);
-  HR_TIME_POINT renderStart = NOW;
 
   // render
   // Win32 optimisation test
   //cairo_surface_t *surface = cairo_win32_surface_create_with_dib(CAIRO_FORMAT_ARGB32, c->width, c->height);
   
   cairo_surface_t *surface = cairo_image_surface_create_for_data(c->renderBuffer, CAIRO_FORMAT_ARGB32, c->width, c->height, c->stride);
+  cairo_status_t status = cairo_surface_status(surface);
+  ASYNC_CAIRO_ERROR;
+
   cairo_t* cr = cairo_create(surface);
+  status = cairo_status(cr);
+  ASYNC_CAIRO_ERROR;
+
   {
     #ifdef _WIN32
     // cairo is not thread safe on windows
     std::lock_guard<std::mutex> lk(m);
     #endif
 
+    HR_TIME_POINT renderStart = NOW;
     gboolean success = rsvg_handle_render_cairo(handle, cr);
 
     if (FALSE == success) {
@@ -78,8 +84,10 @@ void renderExecute(napi_env env, void* data) {
         __FILE__, __LINE__ - 6, "failed to render SVG via cairo");
       c->errorMsg = std::string(errorMsg);
     }
+
+    cairo_surface_flush(surface);
+    c->renderTime = microTime(renderStart);
   }
-  cairo_surface_flush(surface);
 
   if (!c->pngPath.empty()) {
     cairo_status_t status = cairo_surface_write_to_png (surface, c->pngPath.c_str());
@@ -92,10 +100,8 @@ void renderExecute(napi_env env, void* data) {
 
   cairo_destroy(cr);
   cairo_surface_destroy(surface);
-
   rsvg_handle_close(handle, &error);
 
-  c->renderTime = microTime(renderStart);
   c->totalTime = microTime(start);
 }
 
@@ -128,6 +134,9 @@ void renderComplete(napi_env env, napi_status asyncStatus, void* data) {
   c->status = napi_create_int64(env, (int64_t) c->renderTime, &renderValue);
   REJECT_STATUS;
   c->status = napi_set_named_property(env, result, "renderTime", renderValue);
+  REJECT_STATUS;
+
+  c->status = napi_delete_reference(env, c->bufferRef);
   REJECT_STATUS;
 
   napi_status status;
@@ -182,7 +191,8 @@ napi_value renderSVG(napi_env env, napi_callback_info info) {
     return nullptr;
   }
 
-  status = napi_get_buffer_info(env, args[1], (void**)&c->renderBuffer, &c->renderBufLen);
+  napi_value bufferValue = args[1];
+  status = napi_get_buffer_info(env, bufferValue, (void**)&c->renderBuffer, &c->renderBufLen);
   CHECK_STATUS;
 
   status = napi_typeof(env, args[2], &t);
@@ -289,6 +299,9 @@ napi_value renderSVG(napi_env env, napi_callback_info info) {
     return nullptr;
   }
   #endif
+
+  status = napi_create_reference(env, bufferValue, 1, &c->bufferRef);
+  CHECK_STATUS;
 
   status = napi_create_reference(env, renderer, 1, &c->passthru);
   CHECK_STATUS;

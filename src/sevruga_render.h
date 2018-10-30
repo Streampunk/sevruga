@@ -29,6 +29,7 @@ struct renderCarrier : carrier {
   size_t sourceLength;
   unsigned char* renderBuffer;
   size_t renderBufLen;
+  napi_ref bufferRef = nullptr;
   uint32_t width;
   uint32_t height;
   uint32_t stride;

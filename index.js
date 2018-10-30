@@ -20,13 +20,12 @@ const SegfaultHandler = require('segfault-handler');
 SegfaultHandler.registerHandler('crash.log'); // With no argument, SegfaultHandler will generate a generic log file name
 
 function createRenderStream(params) {
-  const svgRender = async (svgStr, buf, params) => await addon.renderSVG(svgStr, buf, params);
   return new Transform({
     decodeStrings: params.decodeStrings || false,
     highWaterMark: params.highwaterMark || 16384,
     transform(svgStr, encoding, cb) {
       const renderBuf = Buffer.alloc(params.width * params.height * 4); // ARGB 8-bit per component
-      svgRender(svgStr, renderBuf, params)
+      addon.renderSVG(svgStr, renderBuf, params)
         .then(t => {
           renderBuf.timings = t;
           cb(null, renderBuf);
