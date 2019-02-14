@@ -1,9 +1,5 @@
 # sevruga
-A [Node.JS](https://nodejs.org/) binding for [librsvg](https://github.com/GNOME/librsvg).
-
-### Native bindings
-
-This binding uses the experimental [N-API](https://nodejs.org/dist/latest-v8.x/docs/api/n-api.html) for the development of a C++ addon for Node.JS. Note that N-API will become a core part of Node.JS in version 10 LTS available from October 2018. Until then, a warning about this features being experimental will be printed.
+A [Node.JS](https://nodejs.org/) binding for [librsvg](https://github.com/GNOME/librsvg). 
 
 ## Installation
 
@@ -43,7 +39,7 @@ Install the librsvg library and header files. Usually you have to look for a dev
     pacman -S mingw-w64-x86_64-librsvg
     ```
 
-Install [Node.JS](https://nodejs.org/) LTS for your platform.
+Install [Node.JS](https://nodejs.org/) LTS for your platform, currently the latest v10.
 
 Install the C++ build tools [node-gyp](https://github.com/nodejs/node-gyp) by following the [installation instructions](https://github.com/nodejs/node-gyp#installation).
 
